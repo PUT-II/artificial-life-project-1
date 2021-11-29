@@ -37,6 +37,7 @@ class AustralianRabbits(AbstractAustralianRabbits):
         self.female_count = 0
         self.population_size = 0
         self.diseased_count = 0
+        self.immune_count = 0
         self.last_id: int = starting_population
         self.population: Set[Rabbit] = set()
 
@@ -44,7 +45,8 @@ class AustralianRabbits(AbstractAustralianRabbits):
             "males": "male_count",
             "females": "female_count",
             "population": "population_size",
-            "diseased": "diseased_count"
+            "diseased": "diseased_count",
+            "immune": "immune_count"
         })
 
         self.schedule = RandomActivation(self)
@@ -111,16 +113,17 @@ class AustralianRabbits(AbstractAustralianRabbits):
         self.__update_counters()
         self.datacollector.collect(self)
 
-        if self.population_size != 0 and self.male_count != 0 and self.male_count == 0:
+        if self.population_size == 0 or self.female_count == 0 or self.male_count == 0:
+            self.running = False
             return
 
-        if self.diseased_count != 0:
+        if self.diseased_count == 0:
+            self.running = False
             return
 
-        if any(a.is_immune() for a in self.population):
+        if all(a.is_immune() for a in self.population):
+            self.running = False
             return
-
-        self.running = False
 
     def get_new_id(self) -> int:
         new_id = self.last_id
@@ -146,8 +149,5 @@ class AustralianRabbits(AbstractAustralianRabbits):
         self.population_size = len(self.population)
         self.male_count = len(male_population)
         self.female_count = self.population_size - self.male_count
-        self.diseased_count = self.__count_diseased_agents(self.population)
-
-    @staticmethod
-    def __count_diseased_agents(agents: Set[Rabbit]):
-        return len(list(None for agent in agents if agent.virus))
+        self.diseased_count = len(list(None for agent in self.population if agent.virus))
+        self.immune_count = len(list(None for agent in self.population if agent.is_immune()))

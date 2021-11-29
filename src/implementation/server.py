@@ -49,7 +49,8 @@ population_chart = ChartModule([
 
 diseased_chart = ChartModule([
     {"Label": "population", "Color": "green"},
-    {"Label": "diseased", "Color": "black"}
+    {"Label": "diseased", "Color": "black"},
+    {"Label": "immune", "Color": "gray"}
 ])
 
 rabbits_canvas = SimpleCanvas(rabbit_draw, 500, 500)

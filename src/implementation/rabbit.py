@@ -44,7 +44,7 @@ class Rabbit(Agent):
 
         # noinspection PyTypeChecker
         self.virus: DeadlyRabbitVirus = None
-        self.immunity_genetic_code = np.zeros(16)
+        self.immunity_genetic_code = np.zeros(DeadlyRabbitVirus.GENETIC_CODE_LENGTH)
 
     def __hash__(self) -> int:
         return self.unique_id
@@ -66,9 +66,11 @@ class Rabbit(Agent):
             self.try_to_reproduce()
 
         if self.virus is not None:
+
             self.try_to_gain_immunity()
             self.virus.age += 1
-            self.virus.try_to_mutate()
+            if self.is_immune():
+                self.virus.try_to_mutate()
             self.transmit_virus()
 
         self.move()
@@ -107,7 +109,7 @@ class Rabbit(Agent):
                 unique_id=self.model.get_new_id(),
                 model=self.model,
                 pos=self.pos,
-                speed=np.random.randint(4, 7),
+                speed=np.random.randint(4, 6 + 1),
                 velocity=np.random.uniform(-1, 1, 2),
                 reproduction_distance=self.reproduction_distance,
                 reproduction_chance=self.reproduction_chance,
@@ -126,7 +128,7 @@ class Rabbit(Agent):
                                                                               self.virus.transmission_distance,
                                                                               include_center=False)
 
-        transmission_neighbors = list(n for n in transmission_neighbors if n.virus is None)
+        transmission_neighbors = list(n for n in transmission_neighbors if n.virus is None or n.virus != self.virus)
 
         for neighbor in transmission_neighbors:
             if np.random.random() > self.virus.transmission_chance:
