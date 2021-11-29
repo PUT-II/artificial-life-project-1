@@ -17,5 +17,5 @@ class AbstractAustralianRabbits(ABC, Model):
         pass
 
     @abstractmethod
-    def remove_agent(self, agent) -> None:
+    def remove_agent(self, agent, death_from_virus: bool = False) -> None:
         pass

@@ -41,6 +41,10 @@ class AustralianRabbits(AbstractAustralianRabbits):
         self.last_id: int = starting_population
         self.population: Set[Rabbit] = set()
 
+        self.total_population = 0
+        self.total_death_count = 0
+        self.death_ratio = 0.0
+
         self.datacollector = DataCollector({
             "males": "male_count",
             "females": "female_count",
@@ -134,11 +138,16 @@ class AustralianRabbits(AbstractAustralianRabbits):
         if len(self.population) >= self.POPULATION_LIMIT:
             return
 
+        self.total_population += 1
+
         self.space.place_agent(agent, agent.pos)
         self.schedule.add(agent)
         self.population.add(agent)
 
-    def remove_agent(self, agent: Rabbit) -> None:
+    def remove_agent(self, agent: Rabbit, death_from_virus: bool = False) -> None:
+        if death_from_virus:
+            self.total_death_count += 1
+
         self.space.remove_agent(agent)
         self.schedule.remove(agent)
         self.population.remove(agent)
@@ -151,3 +160,4 @@ class AustralianRabbits(AbstractAustralianRabbits):
         self.female_count = self.population_size - self.male_count
         self.diseased_count = len(list(None for agent in self.population if agent.virus))
         self.immune_count = len(list(None for agent in self.population if agent.is_immune()))
+        self.death_ratio = self.total_death_count / self.total_population

@@ -34,12 +34,17 @@ def rabbit_draw(agent: Rabbit):
 
 class PopulationElement(TextElement):
     def render(self, model: AustralianRabbits):
-        return "Population: " + str(model.population_size)
+        return f"Population: {model.population_size}"
 
 
 class DiseasedElement(TextElement):
     def render(self, model: AustralianRabbits):
-        return "Diseased: " + str(model.diseased_count)
+        return f"Diseased: {model.diseased_count}"
+
+
+class DeathRatioElement(TextElement):
+    def render(self, model: AustralianRabbits):
+        return f"Death ratio : {model.death_ratio:.4f}"
 
 
 population_chart = ChartModule([
@@ -68,5 +73,6 @@ model_params = {
     "incubation_period": UserSettableParameter("slider", "Incubation period", 20, 2, 50),
 }
 
-elements = [rabbits_canvas, PopulationElement(), DiseasedElement(), population_chart, diseased_chart]
+elements = [rabbits_canvas, DeathRatioElement(), PopulationElement(), DiseasedElement(), population_chart,
+            diseased_chart]
 server = ModularServer(AustralianRabbits, elements, "Australian Rabbits", model_params)

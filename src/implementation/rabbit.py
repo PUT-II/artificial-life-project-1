@@ -137,17 +137,17 @@ class Rabbit(Agent):
             neighbor.virus = self.virus.clone()
 
     def try_to_gain_immunity(self):
-        if np.random.random() > self.immunity_chance:
+        if self.immunity_chance == 0.0 or np.random.random() > self.immunity_chance:
             return
 
         self.immunity_genetic_code = self.virus.genetic_code
 
     def try_to_die(self) -> bool:
-        can_die = self.energy <= 0 \
-                  or (self.virus is not None and not self.is_immune() and self.virus.kill_host())
+        die_from_natural_causes = self.energy <= 0
+        die_from_virus = self.virus is not None and not self.is_immune() and self.virus.kill_host()
 
-        if can_die:
-            self.model.remove_agent(self)
+        if die_from_natural_causes or die_from_virus:
+            self.model.remove_agent(self, die_from_virus)
             return True
         else:
             return False
